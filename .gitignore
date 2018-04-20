@@ -1,0 +1,14 @@
+logs
+*.log
+npm-debug.log*
+node_modules
+stacktrace*
+.idea
+*.iml
+build
+.env
+prebuilds
+builds
+*.DS_Store
+examples/electron-example/.DS_Store
+
