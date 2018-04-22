@@ -1,6 +1,6 @@
 {
-  "name": "iohook",
-  "version": "0.1.13",
+  "name": "iohook-lib",
+  "version": "0.1.0",
   "description": "Node.js global keyboard and mouse hook",
   "main": "index.js",
   "types": "index.d.ts",
@@ -26,7 +26,7 @@
     "global keypress",
     "shortcut"
   ],
-  "author": "Aloyan Dmitry",
+  "author": "Hrishabh Kumar",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/rpa-helpers/iohook-lib/issues"
@@ -83,6 +83,11 @@
       "electron",
       "1.7.10",
       "54"
+    ],
+    [
+      "electron",
+      "1.8.2",
+      "57"
     ],
     [
       "node",
