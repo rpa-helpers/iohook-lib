@@ -1,6 +1,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/bxo4qp4jfld1ucha/branch/master?svg=true)](https://ci.appveyor.com/project/hrishabhkumar/iohook-lib/branch/master)
-
 [![Build Status](https://travis-ci.org/rpa-helpers/iohook-lib.svg?branch=master)](https://travis-ci.org/rpa-helpers/iohook-lib)
+[![dependencies Status](https://david-dm.org/rpa-helpers/iohook-lib/status.svg)](https://david-dm.org/rpa-helpers/iohook-lib)
 
 # iohook
 Node.js global native keyboard and mouse listener.  
