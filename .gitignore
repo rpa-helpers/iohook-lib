@@ -12,3 +12,11 @@ builds
 *.DS_Store
 examples/electron-example/.DS_Store
 
+.deps/
+libuiohook/include/config.h
+libuiohook/include/stamp-h1
+yarn.lock
+libuiohook/Makefile
+libuiohook/config.status
+libuiohook/libtool
+libuiohook/pc/uiohook.pc
