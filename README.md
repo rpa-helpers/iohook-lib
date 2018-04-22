@@ -1,4 +1,5 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/ph54iicf29ipy8wm?svg=true)](https://ci.appveyor.com/project/rpa-helpers/iohook-lib)
+[![Build status](https://ci.appveyor.com/api/projects/status/bxo4qp4jfld1ucha/branch/master?svg=true)](https://ci.appveyor.com/project/hrishabhkumar/iohook-lib/branch/master)
+
 [![Build Status](https://travis-ci.org/rpa-helpers/iohook-lib.svg?branch=master)](https://travis-ci.org/rpa-helpers/iohook-lib)
 
 # iohook

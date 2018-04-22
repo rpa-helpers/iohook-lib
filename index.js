@@ -7,8 +7,16 @@ try {
   const SegfaultHandler = require('segfault-handler');
   SegfaultHandler.registerHandler("iohook-crash.log");
 } catch (e) {}
-
-const runtime = process.versions['electron'] ? 'electron' : 'node';
+function isElectron() {
+  try {
+    const electron = require('electron');
+    if (typeof electron !== 'object') return false;
+  } catch(e) {
+    return false;
+  }
+  return true;
+}
+const runtime = isElectron() ? 'electron' : 'node';
 const essential = runtime + '-v' + process.versions.modules + '-' + process.platform + '-' + process.arch;
 const modulePath = path.join(__dirname, 'builds', essential, 'build', 'Release', 'iohook.node');
 if (process.env.DEBUG) {
