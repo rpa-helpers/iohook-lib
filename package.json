@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WilixLead/iohook.git"
+    "url": "git+https://github.com/rpa-helpers/iohook-lib.git"
   },
   "keywords": [
     "hook",
@@ -29,9 +29,9 @@
   "author": "Aloyan Dmitry",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/WilixLead/iohook/issues"
+    "url": "https://github.com/rpa-helpers/iohook-lib/issues"
   },
-  "homepage": "https://github.com/WilixLead/iohook#readme",
+  "homepage": "https://github.com/rpa-helpers/iohook-lib#readme",
   "dependencies": {
     "@types/node": "^7.0.39",
     "bindings": "^1.3.0",

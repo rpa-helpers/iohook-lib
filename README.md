@@ -1,12 +1,11 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/ph54iicf29ipy8wm?svg=true)](https://ci.appveyor.com/project/WilixLead/iohook)
-[![Build Status](https://travis-ci.org/WilixLead/iohook.svg?branch=master)](https://travis-ci.org/WilixLead/iohook)
+[![Build status](https://ci.appveyor.com/api/projects/status/ph54iicf29ipy8wm?svg=true)](https://ci.appveyor.com/project/rpa-helpers/iohook-lib)
+[![Build Status](https://travis-ci.org/WilixLead/iohook.svg?branch=master)](https://travis-ci.org/rpa-helpers/iohook-lib)
 
 # iohook
 Node.js global native keyboard and mouse listener.  
 This module can handle keyboard and mouse events via native hooks.  
 **(this module don't require Java (jnativehook) or any other runtimes. Raw C++ implementation, should be very fast)**  
 
-If you like this module or are interested in updates, follow me on Twitter [https://twitter.com/wilixlead](https://twitter.com/wilixlead)
 
 ## OS Support
 Already tested in:
