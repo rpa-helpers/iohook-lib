@@ -3,7 +3,7 @@ import { EventEmitter } from 'events'
 /**
  * Native module for hooking keyboard and mouse events
  */
-declare class IOHook extends EventEmitter<IOHookEvent> {
+declare class IOHook extends EventEmitter {
   /**
    * Start hooking engine. Call it when you ready to receive events
    * @param {boolean} enableLogger If true, module will publish debug information to stdout
@@ -32,18 +32,31 @@ declare class IOHook extends EventEmitter<IOHookEvent> {
   setDebug(mode: boolean): void
 
   /**
+   * Enable mouse click propagation (enabled by default).
+   * The click event are emitted and propagated.
+   */
+  enableClickPropagation(): void
+
+
+  /**
+   * Disable mouse click propagation.
+   * The click event are captured and the event emitted but not propagated to the window.
+   */
+  disableClickPropagation(): void
+
+  /**
    * Register global shortcut. When all keys in keys array pressed, callback will be called
    * @param {Array<string|number>} keys Array of keycodes
    * @param {Function} callback Callback for call when shortcut pressed
    * @return {number} ShortcutId for unregister
    */
-  registerShortcut(keys, callback): number
+  registerShortcut(keys: Array<string|number>, callback: Function): number
 
   /**
    * Unregister shortcut by ShortcutId
-   * @param shortcutId
+   * @param {number} shortcutId
    */
-  unregisterShortcut(shortcutId): void
+  unregisterShortcut(shortcutId: number): void
 
   /**
    * Unregister all shortcuts
@@ -54,7 +67,7 @@ declare class IOHook extends EventEmitter<IOHookEvent> {
 declare interface IOHookEvent {
   type: string
   keychar?: number
-  keycode?: number 
+  keycode?: number
   rawcode?: number
   button?: number
   clicks?: number
