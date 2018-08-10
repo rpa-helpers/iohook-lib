@@ -1,8 +1,7 @@
-'use strict';
 const EventEmitter = require('events');
 const path = require('path');
 
-// Try use handler if runtime and ABI is compatible  
+// Try use handler if runtime and ABI is compatible
 try {
   const SegfaultHandler = require('segfault-handler');
   SegfaultHandler.registerHandler("iohook-crash.log");
@@ -33,18 +32,19 @@ class IOHook extends EventEmitter {
     super();
     this.active = false;
     this.shortcuts = [];
-    
+
+    this.lastKeydownShift = false;
+    this.lastKeydownAlt = false;
+    this.lastKeydownCtrl = false;
+    this.lastKeydownMeta = false;
+
     this.load();
-    if (process.env.DEBUG) {
-      this.setDebug(true);
-    } else {
-      this.setDebug(false);
-    }
+    this.setDebug(false);
   }
 
   /**
    * Start hook process
-   * @param enableLogger Turn on debug logging 
+   * @param enableLogger Turn on debug logging
    */
   start(enableLogger) {
     if (!this.active) {
@@ -54,7 +54,7 @@ class IOHook extends EventEmitter {
   }
 
   /**
-   * Shutdown event hook 
+   * Shutdown event hook
    */
   stop() {
     if (this.active) {
@@ -98,14 +98,14 @@ class IOHook extends EventEmitter {
   unregisterAllShortcuts() {
     this.shortcuts.splice(0, this.shortcuts.length);
   }
-  
+
   /**
    * Load native module
    */
   load() {
     NodeHookAddon.startHook(this._handler.bind(this), this.debug || false);
   }
-  
+
   /**
    * Unload native module and stop hook
    */
@@ -121,30 +121,127 @@ class IOHook extends EventEmitter {
   setDebug(mode) {
     NodeHookAddon.debugEnable(mode);
   }
-  
+
+  /**
+   * Disable mouse click propagation.
+   * The click event are captured and the event emitted but not propagated to the window.
+   */
+  disableClickPropagation() {
+    NodeHookAddon.grabMouseClick(true);
+  }
+
+  /**
+   * Enable mouse click propagation (enabled by default).
+   * The click event are emitted and propagated.
+   */
+  enableClickPropagation() {
+    NodeHookAddon.grabMouseClick(false);
+  }
+
   /**
    * Local event handler. Don't use it in your code!
    * @param msg Raw event message
    * @private
    */
   _handler(msg) {
-    if (this.active === false) {
-      return;
-    }
-    
-    if (!msg) {
-      return;
-    }
+    if (this.active === false || !msg) return;
 
     if (events[msg.type]) {
-      let event = msg.mouse || msg.keyboard || msg.wheel;
+      const event = msg.mouse || msg.keyboard || msg.wheel;
+
       event.type = events[msg.type];
+
+      this._handleShift(event);
+      this._handleAlt(event);
+      this._handleCtrl(event);
+      this._handleMeta(event);
+
       this.emit(events[msg.type], event);
+
+      // If there is any registered shortcuts then handle them.
       if ((event.type === 'keydown' || event.type === 'keyup') && iohook.shortcuts.length > 0) {
         this._handleShortcut(event);
       }
-    } else {
-      console.warn('Unregistered iohook event', msg);
+    }
+  }
+
+  /**
+   * Handles the shift key. Whenever shift is pressed, all future events would
+   * contain { shiftKey: true } in its object, until the shift key is released.
+   * @param event Event object
+   * @private
+   */
+  _handleShift(event) {
+    if (event.type === 'keyup' && event.shiftKey) {
+      this.lastKeydownShift = false;
+    }
+
+    if (event.type === 'keydown' && event.shiftKey) {
+      this.lastKeydownShift = true;
+    }
+
+    if (this.lastKeydownShift) {
+      event.shiftKey = true;
+    }
+  }
+
+  /**
+   * Handles the alt key. Whenever alt is pressed, all future events would
+   * contain { altKey: true } in its object, until the alt key is released.
+   * @param event Event object
+   * @private
+   */
+  _handleAlt(event) {
+    if (event.type === 'keyup' && event.altKey) {
+      this.lastKeydownAlt = false;
+    }
+
+    if (event.type === 'keydown' && event.altKey) {
+      this.lastKeydownAlt = true;
+    }
+
+    if (this.lastKeydownAlt) {
+      event.altKey = true;
+    }
+  }
+
+  /**
+   * Handles the ctrl key. Whenever ctrl is pressed, all future events would
+   * contain { ctrlKey: true } in its object, until the ctrl key is released.
+   * @param event Event object
+   * @private
+   */
+  _handleCtrl(event) {
+    if (event.type === 'keyup' && event.ctrlKey) {
+      this.lastKeydownCtrl = false;
+    }
+
+    if (event.type === 'keydown' && event.ctrlKey) {
+      this.lastKeydownCtrl = true;
+    }
+
+    if (this.lastKeydownCtrl) {
+      event.ctrlKey = true;
+    }
+  }
+
+  /**
+   * Handles the meta key. Whenever meta is pressed, all future events would
+   * contain { metaKey: true } in its object, until the meta key is released.
+   * @param event Event object
+   * @private
+   */
+  _handleMeta(event) {
+    if (event.type === 'keyup' && event.metaKey) {
+      this.lastKeydownMeta = false;
+    }
+
+    if (event.type === 'keydown' && event.metaKey) {
+      this.lastKeydownMeta = true;
+    }
+
+    if (this.lastKeydownMeta) {
+      event.metaKey = true;
     }
   }
 
