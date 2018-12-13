@@ -6,6 +6,7 @@ stacktrace*
 .idea
 *.iml
 build
+.vs/
 .env
 prebuilds
 builds
