@@ -3,6 +3,7 @@
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const axios = require('axios');
 const get = require('simple-get');
 const pump = require('pump');
 const tfs = require('tar-fs');
@@ -28,53 +29,51 @@ function install(runtime, abi, platform, arch, cb) {
   const currentPlatform = pkg.name + '-v' + pkgVersion + '-' + essential;
 
   console.log('Downloading prebuild for platform:', currentPlatform);
-  let downloadUrl = 'https://github.com/rpa-helpers/iohook-lib/releases/download/v' + pkgVersion + '/' + currentPlatform + '.tar.gz';
-
-  let reqOpts = {url: downloadUrl};
   let tempFile = path.join(os.tmpdir(), 'prebuild.tar.gz');
-  let req = get(reqOpts, function(err, res) {
-    if (err) {
-      return onerror(err);
-    }
-    if (res.statusCode !== 200) {
-      if (res.statusCode === 404) {
-        console.error('Prebuild for current platform (' + currentPlatform + ') not found!');
-        console.error('Try to compile for your platform:');
-        console.error('# cd node_modules/iohook;');
-        console.error('# npm run compile');
-        console.error('');
-        return onerror('Prebuild for current platform (' + currentPlatform + ') not found!');
+  const getReleaseUrl = 'https://api.github.com/repos/rpa-helpers/iohook-lib/releases/tags/v' + pkgVersion;
+  axios.get(getReleaseUrl).then(function(res1) {
+    const assets = res1.data.assets;
+    let prebuildAssetUrl;
+    for(let i = 0; i < assets.length; i += 1) {
+      const asset = assets[i];
+      if (asset.name === (currentPlatform + '.tar.gz')) {
+        prebuildAssetUrl = asset.url;
+        break;
       }
-      return onerror('Bad response from prebuild server. Code: ' + res.statusCode);
     }
-    pump(res, fs.createWriteStream(tempFile), function(err) {
-      if (err) {
-        throw err;
+    axios({
+      url: prebuildAssetUrl,
+      method: 'GET',
+      responseType: 'stream',
+      headers: {
+        Accept: 'application/octet-stream'
       }
-      let options = {
-        readable: true,
-        writable: true,
-        hardlinkAsFilesFallback: true
-      };
-      let binaryName;
-      let updateName = function(entry) {
-        if (/\.node$/i.test(entry.name)) binaryName = entry.name
-      };
-      let targetFile = path.join(__dirname, 'builds', essential);
-      let extract = tfs.extract(targetFile, options)
-        .on('entry', updateName);
-      pump(fs.createReadStream(tempFile), zlib.createGunzip(), extract, function(err) {
-        if (err) {
-          return onerror(err);
-        }
-        cb()
-      })
-    })
-  });
-
-  req.setTimeout(30 * 1000, function() {
-    req.abort()
-  })
+    }).then(function(res) {
+        const writer = fs.createWriteStream(tempFile);
+        res.data.pipe(writer);
+        writer.on('finish', function() {
+          let options = {
+            readable: true,
+            writable: true,
+            hardlinkAsFilesFallback: true
+          };
+          let binaryName;
+          let updateName = function(entry) {
+            if (/\.node$/i.test(entry.name)) binaryName = entry.name
+          };
+          let targetFile = path.join(__dirname, 'builds', essential);
+          let extract = tfs.extract(targetFile, options)
+            .on('entry', updateName);
+          pump(fs.createReadStream(tempFile), zlib.createGunzip(), extract, function(err) {
+            if (err) {
+              return onerror(err);
+            }
+            cb()
+          });
+        })
+        writer.on('error', onerror)
+     }).catch(onerror);
+  }).catch(onerror);
 }
 
 /**
@@ -132,7 +131,7 @@ if (options.targets.length > 0) {
     let abi = parts[1];
     options.platforms.forEach(function(platform) {
       options.arches.forEach(function(arch) {
-        if ((platform === 'darwin' || platform === 'linux') && arch === 'ia32') {
+        if ((platform === 'darwin' || platform === 'linux') && arch === 'ia32' || os.platform() !== platform) {
           return;
         }
         chain = chain.then(function() {
