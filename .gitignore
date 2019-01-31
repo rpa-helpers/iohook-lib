@@ -21,3 +21,4 @@ libuiohook/Makefile
 libuiohook/config.status
 libuiohook/libtool
 libuiohook/pc/uiohook.pc
+libuiohook/*.vcxproj*
